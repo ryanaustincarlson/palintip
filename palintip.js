@@ -1,19 +1,19 @@
 
-function dollar_string(num)
+function dollarString(num)
 {
 	var s = num.toString();
-	var decimal_idx = s.indexOf('.');
-	if (decimal_idx > 0)
+	var decimalIdx = s.indexOf('.');
+	if (decimalIdx > 0)
 	{
-		var num_decimals = s.substr(decimal_idx+1,s.length).length;
+		var numDecimals = s.substr(decimalIdx+1,s.length).length;
 
-		if (num_decimals == 1)
+		if (numDecimals == 1)
 		{
 			s += '0';
 		}
-		else if (num_decimals > 2)
+		else if (numDecimals > 2)
 		{
-			s = s.substr(0,decimal_idx+3);
+			s = s.substr(0,decimalIdx+3);
 		}
 	}
 	else
@@ -24,45 +24,45 @@ function dollar_string(num)
 	return s;
 }
 
-function is_palindrome(num)
+function isPalindrome(num)
 {
-	var s = dollar_string(num).replace('.','');
+	var s = dollarString(num).replace('.','');
 	return s == s.split('').reverse().join('');
 }
 
-function calculate_tip_percent(total, original)
+function calculateTipPercent(total, original)
 {
 	total = parseFloat(total);
 	original = parseFloat(original);
 	var amt = (1. * total / original) - 1; 
-	return dollar_string(amt * 100.);
+	return dollarString(amt * 100.);
 }
 
-function calculate_tip_dollar(total, original)
+function calculateTipDollar(total, original)
 {
 	total = parseFloat(total);
 	original = parseFloat(original);
-	return dollar_string(total - original);
+	return dollarString(total - original);
 }
 
-function find_palintip(amount, target_tip_percent)
+function findPalintip(amount, targetTipPercent)
 {
-	var total = amount * (1 + target_tip_percent / 100.);
+	var total = amount * (1 + targetTipPercent / 100.);
 
 	var lower = total;
 	var upper = total;
-	while (!is_palindrome(lower))
+	while (!isPalindrome(lower))
 	{
 		lower -= .01;
 	}
 
-	while (!is_palindrome(upper))
+	while (!isPalindrome(upper))
 	{
 		upper += .01;
 	}
 
-	lower = dollar_string(lower)
-	upper = dollar_string(upper)
+	lower = dollarString(lower)
+	upper = dollarString(upper)
 
 	if (lower == upper)
 	{
@@ -72,15 +72,15 @@ function find_palintip(amount, target_tip_percent)
 	return [lower, upper];
 }
 
-var bill = 54;
-var tip = 20;
+// var bill = 54;
+// var tip = 20;
 
-var totals = find_tipindrome(bill, tip);
+// var totals = find_tipindrome(bill, tip);
 
-for (var i=0; i<totals.length; i++)
-{
-	var total = totals[i];
-	console.log("total: " + total + 
-		", tip $: " + calculate_tip_dollar(total, bill) + 
-		", tip %: " + calculate_tip_percent(total, bill));
-}
+// for (var i=0; i<totals.length; i++)
+// {
+// 	var total = totals[i];
+// 	console.log("total: " + total + 
+// 		", tip $: " + calculate_tip_dollar(total, bill) + 
+// 		", tip %: " + calculate_tip_percent(total, bill));
+// }
