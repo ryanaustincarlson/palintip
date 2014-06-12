@@ -1,0 +1,113 @@
+<html>
+<head>
+
+	<link rel="stylesheet" type="text/css" href="style.css" />
+
+</head>
+<body>
+	<h1> Palintip </h1>
+	<form>
+		<input class="value" id="bill" type="number" placeholder="Bill $" autofocus />
+		<input class="value" id="tip" type="number" placeholder="Tip %" />
+	</form>
+
+	<div id="results">
+	</div>
+
+	<script type="text/javascript" src="palintip.js"></script>
+
+	<script type="text/javascript">
+		var billElt = document.getElementById("bill")
+		var tipElt = document.getElementById("tip")
+
+		// billElt.value = 50;
+		// tipElt.value = 20;
+		// constructResults();
+
+		billElt.onchange = function ()
+		{
+			// console.log(billElt.value);	
+			constructResults()
+		}
+
+		tipElt.onchange = function ()
+		{
+			// if (this.value.indexOf('%') != this.value.lenth)
+			// {
+			// 	this.value += " %";
+			// }
+			// this.value = this.value.substr(0, this.value.indexOf('%')+1)
+			// var newVal = this.value + '%';
+			
+			// tipElt.setAttribute("value", newVal)
+			constructResults()
+		}
+
+		var constructResults = function()
+		{
+			var bill = parseFloat(billElt.value);
+			var tip = parseFloat(tipElt.value);
+
+			if (!bill || !tip)
+			{
+				return;
+			}
+
+			console.log("bill: " + bill);
+			console.log("tip: " + tip);
+
+			var totals = findPalintip(bill, tip);
+			console.log("totals: " + totals);
+
+			var resultsElt = document.getElementById("results");
+			var resultsTableElt = document.getElementById("results-table");
+			if (resultsTableElt)
+			{
+				console.log("removing results table");
+				resultsTableElt.parentNode.removeChild(resultsTableElt)
+			}
+
+			function insertCell(tr, text)
+			{
+				var c = tr.insertCell(-1);
+				c.appendChild(document.createTextNode(text.toString()));
+			}
+			
+			var table = document.createElement('table');
+			table.id = 'results-table';
+
+			var headerRow = table.insertRow(-1);
+			
+			var tipDollarHeader = document.createElement('th');
+			tipDollarHeader.innerHTML = "Tip $";
+			var tipPercentHeader = document.createElement('th');
+			tipPercentHeader.innerHTML = "Tip %";
+			var totalDollarHeader = document.createElement('th');
+			totalDollarHeader.innerHTML = "Total $";
+
+			headerRow.appendChild(tipDollarHeader);
+			headerRow.appendChild(tipPercentHeader);
+			headerRow.appendChild(totalDollarHeader);
+			
+			for (var r=0; r<totals.length; r++)
+			{
+				var total = totals[r];
+
+				var tr = table.insertRow(-1);
+				insertCell(tr, calculateTipDollar(total, bill))
+				insertCell(tr, calculateTipPercent(total, bill))
+				insertCell(tr, total)
+
+				// for (var c=0; c<3; c++)
+				// {
+				// 	var tc = tr.insertCell();
+				// 	tc.appendChild(document.createTextNode(r.toString() + c.toString()));
+				// }
+			}
+			console.log("table: " + table);
+			resultsElt.appendChild(table);
+		}
+
+	</script>
+</body>
+</html>
