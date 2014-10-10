@@ -42,6 +42,7 @@
 			left: '50%' // Left position relative to parent
 		});
 		var backdrop = document.getElementById("backdrop");
+		var spinningMilliseconds = 250;
 
 		billElt.onchange = function ()
 		{
@@ -73,56 +74,66 @@
 			backdrop.style.display = 'block';
 			spinner.spin(document.getElementById("form"));
 
+			var startDate = new Date();				
+
+			// calculate the tip
 			setTimeout(function() {
 
 				var totals = findPalintip(bill, tip);
 
-				var resultsElt = document.getElementById("results");
-				var resultsTableElt = document.getElementById("results-table");
-				if (resultsTableElt)
-				{
-					resultsTableElt.parentNode.removeChild(resultsTableElt)
-				}
+				var stopDate = new Date();
+				var millisecondsBetween = stopDate.getTime() - startDate.getTime();
+				var timeToWait = Math.max(spinningMilliseconds - millisecondsBetween, 0)
+				setTimeout(function() {
 
-				function insertCell(tr, text)
-				{
-					var c = tr.insertCell(-1);
-					c.appendChild(document.createTextNode(text.toString()));
-				}
+					var resultsElt = document.getElementById("results");
+					var resultsTableElt = document.getElementById("results-table");
+					if (resultsTableElt)
+					{
+						resultsTableElt.parentNode.removeChild(resultsTableElt)
+					}
 
-				var table = document.createElement('table');
-				table.id = 'results-table';
+					function insertCell(tr, text)
+					{
+						var c = tr.insertCell(-1);
+						c.appendChild(document.createTextNode(text.toString()));
+					}
 
-				var headerRow = table.insertRow(-1);
+					var table = document.createElement('table');
+					table.id = 'results-table';
 
-				var tipDollarHeader = document.createElement('th');
-				tipDollarHeader.innerHTML = "Tip $";
-				var tipPercentHeader = document.createElement('th');
-				tipPercentHeader.innerHTML = "Tip %";
-				var totalDollarHeader = document.createElement('th');
-				totalDollarHeader.innerHTML = "Total $";
+					var headerRow = table.insertRow(-1);
 
-				headerRow.appendChild(tipDollarHeader);
-				headerRow.appendChild(tipPercentHeader);
-				headerRow.appendChild(totalDollarHeader);
+					var tipDollarHeader = document.createElement('th');
+					tipDollarHeader.innerHTML = "Tip $";
+					var tipPercentHeader = document.createElement('th');
+					tipPercentHeader.innerHTML = "Tip %";
+					var totalDollarHeader = document.createElement('th');
+					totalDollarHeader.innerHTML = "Total $";
 
-				for (var r=0; r<totals.length; r++)
-				{
-					var total = totals[r];
+					headerRow.appendChild(tipDollarHeader);
+					headerRow.appendChild(tipPercentHeader);
+					headerRow.appendChild(totalDollarHeader);
 
-					var tr = table.insertRow(-1);
-					insertCell(tr, calculateTipDollar(total, bill))
-					insertCell(tr, calculateTipPercent(total, bill))
-					insertCell(tr, total)
-				}
-				resultsElt.appendChild(table);
+					for (var r=0; r<totals.length; r++)
+					{
+						var total = totals[r];
 
-				backdrop.style.display = 'none';
-				spinner.stop();
-				constructingResults = false;
+						var tr = table.insertRow(-1);
+						insertCell(tr, calculateTipDollar(total, bill))
+						insertCell(tr, calculateTipPercent(total, bill))
+						insertCell(tr, total)
+					}
+					resultsElt.appendChild(table);
+
+
+					backdrop.style.display = 'none';
+					spinner.stop();
+					constructingResults = false;
+				}, timeToWait);
 			}, 10);
-}
+		}
 
-</script>
+	</script>
 </body>
 </html>
