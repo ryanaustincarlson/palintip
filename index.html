@@ -1,18 +1,20 @@
 <html>
 <head>
 
+	<script src="lib/spin.min.js" type="text/javascript"></script>
+
 	<link rel="stylesheet" type="text/css" href="style.css" />
 
 </head>
 <body>
+	<div id="backdrop" > </div>
 	<h1> Palintip </h1>
-	<form>
+	<form id="form" >
 		<input class="value" id="bill" type="number" placeholder="Bill $" autofocus />
 		<input class="value" id="tip" type="number" placeholder="Tip %" />
 	</form>
 
-	<div id="results">
-	</div>
+	<div id="results"></div>
 
 	<script type="text/javascript" src="palintip.js"></script>
 
@@ -20,31 +22,44 @@
 		var billElt = document.getElementById("bill")
 		var tipElt = document.getElementById("tip")
 
-		// billElt.value = 50;
-		// tipElt.value = 20;
-		// constructResults();
+		var constructingResults = false;
+		var spinner = new Spinner({
+			lines: 13, // The number of lines to draw
+			length: 30, // The length of each line
+			width: 5, // The line thickness
+			radius: 30, // The radius of the inner circle
+			corners: 1, // Corner roundness (0..1)
+			rotate: 0, // The rotation offset
+			direction: 1, // 1: clockwise, -1: counterclockwise
+			color: '#000', // #rgb or #rrggbb or array of colors
+			speed: 1, // Rounds per second
+			trail: 60, // Afterglow percentage
+			shadow: false, // Whether to render a shadow
+			hwaccel: false, // Whether to use hardware acceleration
+			className: 'spinner', // The CSS class to assign to the spinner
+			zIndex: 2e9, // The z-index (defaults to 2000000000)
+			top: '37%', // Top position relative to parent
+			left: '50%' // Left position relative to parent
+		});
+		var backdrop = document.getElementById("backdrop");
 
 		billElt.onchange = function ()
 		{
-			// console.log(billElt.value);	
 			constructResults()
 		}
 
 		tipElt.onchange = function ()
 		{
-			// if (this.value.indexOf('%') != this.value.lenth)
-			// {
-			// 	this.value += " %";
-			// }
-			// this.value = this.value.substr(0, this.value.indexOf('%')+1)
-			// var newVal = this.value + '%';
-			
-			// tipElt.setAttribute("value", newVal)
 			constructResults()
 		}
 
 		var constructResults = function()
 		{
+			if (constructingResults)
+			{
+				return;
+			}
+
 			var bill = parseFloat(billElt.value);
 			var tip = parseFloat(tipElt.value);
 
@@ -53,61 +68,61 @@
 				return;
 			}
 
-			console.log("bill: " + bill);
-			console.log("tip: " + tip);
+			constructingResults = true;
 
-			var totals = findPalintip(bill, tip);
-			console.log("totals: " + totals);
+			backdrop.style.display = 'block';
+			spinner.spin(document.getElementById("form"));
 
-			var resultsElt = document.getElementById("results");
-			var resultsTableElt = document.getElementById("results-table");
-			if (resultsTableElt)
-			{
-				console.log("removing results table");
-				resultsTableElt.parentNode.removeChild(resultsTableElt)
-			}
+			setTimeout(function() {
 
-			function insertCell(tr, text)
-			{
-				var c = tr.insertCell(-1);
-				c.appendChild(document.createTextNode(text.toString()));
-			}
-			
-			var table = document.createElement('table');
-			table.id = 'results-table';
+				var totals = findPalintip(bill, tip);
 
-			var headerRow = table.insertRow(-1);
-			
-			var tipDollarHeader = document.createElement('th');
-			tipDollarHeader.innerHTML = "Tip $";
-			var tipPercentHeader = document.createElement('th');
-			tipPercentHeader.innerHTML = "Tip %";
-			var totalDollarHeader = document.createElement('th');
-			totalDollarHeader.innerHTML = "Total $";
+				var resultsElt = document.getElementById("results");
+				var resultsTableElt = document.getElementById("results-table");
+				if (resultsTableElt)
+				{
+					resultsTableElt.parentNode.removeChild(resultsTableElt)
+				}
 
-			headerRow.appendChild(tipDollarHeader);
-			headerRow.appendChild(tipPercentHeader);
-			headerRow.appendChild(totalDollarHeader);
-			
-			for (var r=0; r<totals.length; r++)
-			{
-				var total = totals[r];
+				function insertCell(tr, text)
+				{
+					var c = tr.insertCell(-1);
+					c.appendChild(document.createTextNode(text.toString()));
+				}
 
-				var tr = table.insertRow(-1);
-				insertCell(tr, calculateTipDollar(total, bill))
-				insertCell(tr, calculateTipPercent(total, bill))
-				insertCell(tr, total)
+				var table = document.createElement('table');
+				table.id = 'results-table';
 
-				// for (var c=0; c<3; c++)
-				// {
-				// 	var tc = tr.insertCell();
-				// 	tc.appendChild(document.createTextNode(r.toString() + c.toString()));
-				// }
-			}
-			console.log("table: " + table);
-			resultsElt.appendChild(table);
-		}
+				var headerRow = table.insertRow(-1);
 
-	</script>
+				var tipDollarHeader = document.createElement('th');
+				tipDollarHeader.innerHTML = "Tip $";
+				var tipPercentHeader = document.createElement('th');
+				tipPercentHeader.innerHTML = "Tip %";
+				var totalDollarHeader = document.createElement('th');
+				totalDollarHeader.innerHTML = "Total $";
+
+				headerRow.appendChild(tipDollarHeader);
+				headerRow.appendChild(tipPercentHeader);
+				headerRow.appendChild(totalDollarHeader);
+
+				for (var r=0; r<totals.length; r++)
+				{
+					var total = totals[r];
+
+					var tr = table.insertRow(-1);
+					insertCell(tr, calculateTipDollar(total, bill))
+					insertCell(tr, calculateTipPercent(total, bill))
+					insertCell(tr, total)
+				}
+				resultsElt.appendChild(table);
+
+				backdrop.style.display = 'none';
+				spinner.stop();
+				constructingResults = false;
+			}, 10);
+}
+
+</script>
 </body>
 </html>
